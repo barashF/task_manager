@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  task_manager:
+    container_name: task_manager
+    build:
+      context: .
+    command:  bash -c "./wait-for-postgres.sh db ${DB_USER} ${DB_PASSWORD} ${DB_NAME} python src/main.py"
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+  
+  db:
+    image: postgres:16
+    container_name: db_task_manager
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    env_file:
+      - .env
